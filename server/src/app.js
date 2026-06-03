@@ -16,6 +16,7 @@ import authRoutes from './routes/authRoutes.js';
 import facultyRoutes from './routes/facultyRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import rubricRoutes from './routes/rubricRoutes.js';
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.get('/health', (_req, res) => {
 app.use('/api', validateApiKey, trackApiUsage);
 app.use('/api/auth', authRoutes);
 app.use('/api/faculty', facultyRoutes);
+app.use('/api/faculty/rubrics', rubricRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/admin', adminRoutes);
 

@@ -220,7 +220,7 @@ router.get('/papers/:id/pdf', async (req, res) => {
 });
 
 router.post('/exams/assign', async (req, res) => {
-  const { questionPaperId, studentIds, title } = req.body;
+  const { questionPaperId, studentIds, title, rubricId } = req.body;
   const paper = await QuestionPaper.findOne({ _id: questionPaperId, facultyId: req.user._id });
   if (!paper) return res.status(404).json({ success: false, message: 'Paper not found' });
 
@@ -234,6 +234,7 @@ router.post('/exams/assign', async (req, res) => {
       subject: paper.subject,
       title: title || paper.title,
       maxScore: paper.totalMarks,
+      rubricId: rubricId || undefined,
       status: 'assigned',
     });
     exams.push(exam);

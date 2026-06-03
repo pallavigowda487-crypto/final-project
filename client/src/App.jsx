@@ -12,6 +12,8 @@ import PapersList from './pages/faculty/PapersList';
 import EditPaper from './pages/faculty/EditPaper';
 import AssignExam from './pages/faculty/AssignExam';
 import FacultyPerformance from './pages/faculty/Performance';
+import RubricsList from './pages/faculty/rubrics/RubricsList';
+import RubricForm from './pages/faculty/rubrics/RubricForm';
 import StudentDashboard from './pages/student/Dashboard';
 import StudentExams from './pages/student/Exams';
 import TakeExam from './pages/student/TakeExam';
@@ -36,128 +38,29 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/" element={<HomeRedirect />} />
-      <Route
-        path="/faculty"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <FacultyDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/syllabus"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <SyllabusUpload />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/generate"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <GeneratePaper />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/papers"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <PapersList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/papers/:id/edit"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <EditPaper />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/assign"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <AssignExam />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/faculty/performance"
-        element={
-          <ProtectedRoute roles={['faculty', 'admin']}>
-            <FacultyPerformance />
-          </ProtectedRoute>
-        }
-      />
+      
+      <Route path="/faculty" element={<ProtectedRoute roles={['faculty', 'admin']}><FacultyDashboard /></ProtectedRoute>} />
+      <Route path="/faculty/syllabus" element={<ProtectedRoute roles={['faculty', 'admin']}><SyllabusUpload /></ProtectedRoute>} />
+      <Route path="/faculty/generate" element={<ProtectedRoute roles={['faculty', 'admin']}><GeneratePaper /></ProtectedRoute>} />
+      <Route path="/faculty/papers" element={<ProtectedRoute roles={['faculty', 'admin']}><PapersList /></ProtectedRoute>} />
+      <Route path="/faculty/papers/:id/edit" element={<ProtectedRoute roles={['faculty', 'admin']}><EditPaper /></ProtectedRoute>} />
+      <Route path="/faculty/assign" element={<ProtectedRoute roles={['faculty', 'admin']}><AssignExam /></ProtectedRoute>} />
+      <Route path="/faculty/performance" element={<ProtectedRoute roles={['faculty', 'admin']}><FacultyPerformance /></ProtectedRoute>} />
+      
+      {/* Rubric Routes */}
+      <Route path="/faculty/rubrics" element={<ProtectedRoute roles={['faculty', 'admin']}><RubricsList /></ProtectedRoute>} />
+      <Route path="/faculty/rubrics/new" element={<ProtectedRoute roles={['faculty', 'admin']}><RubricForm /></ProtectedRoute>} />
+      <Route path="/faculty/rubrics/:id/edit" element={<ProtectedRoute roles={['faculty', 'admin']}><RubricForm /></ProtectedRoute>} />
 
-      <Route
-        path="/student"
-        element={
-          <ProtectedRoute roles={['student']}>
-            <StudentDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/exams"
-        element={
-          <ProtectedRoute roles={['student']}>
-            <StudentExams />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/exams/:id"
-        element={
-          <ProtectedRoute roles={['student']}>
-            <TakeExam />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/student/reports"
-        element={
-          <ProtectedRoute roles={['student']}>
-            <StudentReports />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/student" element={<ProtectedRoute roles={['student']}><StudentDashboard /></ProtectedRoute>} />
+      <Route path="/student/exams" element={<ProtectedRoute roles={['student']}><StudentExams /></ProtectedRoute>} />
+      <Route path="/student/exams/:id" element={<ProtectedRoute roles={['student']}><TakeExam /></ProtectedRoute>} />
+      <Route path="/student/reports" element={<ProtectedRoute roles={['student']}><StudentReports /></ProtectedRoute>} />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute roles={['admin']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute roles={['admin']}>
-            <AdminUsers />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/usage"
-        element={
-          <ProtectedRoute roles={['admin']}>
-            <AdminUsage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/logs"
-        element={
-          <ProtectedRoute roles={['admin']}>
-            <AdminLogs />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute roles={['admin']}><AdminUsers /></ProtectedRoute>} />
+      <Route path="/admin/usage" element={<ProtectedRoute roles={['admin']}><AdminUsage /></ProtectedRoute>} />
+      <Route path="/admin/logs" element={<ProtectedRoute roles={['admin']}><AdminLogs /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -2,8 +2,20 @@ import { langsmithRun } from '../config/langsmith.js';
 import { sanitizeUserInput } from '../utils/promptSanitizer.js';
 import { getChatModel } from './aiProvider.js';
 
-export const evaluateAnswer = async (question, modelAnswer, studentAnswer, maxMarks) => {
+export const evaluateAnswer = async (question, modelAnswer, studentAnswer, maxMarks, customRubric = null) => {
   const safeAnswer = sanitizeUserInput(studentAnswer);
+  
+  const criteriaList = customRubric 
+    ? customRubric.criteria.map(c => `- ${c.name} (Max Weight: ${c.weight}%): ${c.description}`).join('\n')
+    : `Score on: Correctness, Relevance, Completeness, Concept Understanding (each 0-100).`;
+
+  const criteriaJson = customRubric
+    ? customRubric.criteria.map(c => `    "${c.name}": number (0 to 100)`).join(',\n')
+    : `    "correctness": number,
+    "relevance": number,
+    "completeness": number,
+    "conceptUnderstanding": number`;
+
   const prompt = `Evaluate this student answer objectively.
 
 Question: ${question.question}
@@ -14,17 +26,14 @@ Model Answer: ${modelAnswer}
 Student Answer:
 ${safeAnswer}
 
-Score on: Correctness, Relevance, Completeness, Concept Understanding (each 0-100).
+${customRubric ? `Use the following custom grading rubric criteria:\n${criteriaList}` : criteriaList}
 
 Return JSON only:
 {
   "marksAwarded": number (0 to ${maxMarks}),
   "feedback": "string",
   "criteria": {
-    "correctness": number,
-    "relevance": number,
-    "completeness": number,
-    "conceptUnderstanding": number
+${criteriaJson}
   },
   "weakTopic": "string or null"
 }`;
@@ -49,7 +58,7 @@ Return JSON only:
   return JSON.parse(jsonMatch[0]);
 };
 
-export const evaluateExam = async (questionPaper, answers) => {
+export const evaluateExam = async (questionPaper, answers, customRubric = null) => {
   const results = [];
   const weakTopics = new Set();
 
@@ -80,7 +89,8 @@ export const evaluateExam = async (questionPaper, answers) => {
         question,
         question.modelAnswer,
         studentAnswer,
-        question.marks
+        question.marks,
+        customRubric
       );
       results.push({
         questionIndex: i,

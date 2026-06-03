@@ -5,14 +5,18 @@ import api from '../../services/api';
 
 export default function AssignExam() {
   const [papers, setPapers] = useState([]);
+  const [rubrics, setRubrics] = useState([]);
   const [students, setStudents] = useState([]);
-  const [form, setForm] = useState({ questionPaperId: '', studentIds: [], title: '' });
+  const [form, setForm] = useState({ questionPaperId: '', rubricId: '', studentIds: [], title: '' });
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     api.get('/faculty/papers').then((r) => {
       setPapers(r.data.papers || []);
       if (r.data.papers?.[0]) setForm((f) => ({ ...f, questionPaperId: r.data.papers[0]._id }));
+    });
+    api.get('/faculty/rubrics').then((r) => {
+      setRubrics(r.data.rubrics || []);
     });
     api.get('/faculty/students').then((r) => setStudents(r.data.students || []));
   }, []);
@@ -51,6 +55,21 @@ export default function AssignExam() {
               {papers.map((p) => (
                 <option key={p._id} value={p._id}>
                   {p.title} — {p.subject}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Evaluation Rubric</label>
+            <select
+              value={form.rubricId}
+              onChange={(e) => setForm({ ...form, rubricId: e.target.value })}
+              className="w-full px-4 py-2 border rounded-lg"
+            >
+              <option value="">Default AI Evaluation</option>
+              {rubrics.map((r) => (
+                <option key={r._id} value={r._id}>
+                  {r.title}
                 </option>
               ))}
             </select>

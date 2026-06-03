@@ -5,6 +5,7 @@ import { protect, authorize } from '../middleware/auth.js';
 import Exam from '../models/Exam.js';
 import QuestionPaper from '../models/QuestionPaper.js';
 import Report from '../models/Report.js';
+import Rubric from '../models/Rubric.js';
 import { evaluateExam } from '../services/evaluationService.js';
 import { generateFeedbackReportPDF, getUploadsDir } from '../services/pdfService.js';
 import { logAudit } from '../utils/auditLogger.js';
@@ -86,7 +87,8 @@ router.post(
     if (!exam) return res.status(404).json({ success: false, message: 'Exam not found or already submitted' });
 
     const paper = await QuestionPaper.findById(exam.questionPaperId._id || exam.questionPaperId);
-    const evaluation = await evaluateExam(paper, req.body.answers);
+    const rubric = exam.rubricId ? await Rubric.findById(exam.rubricId) : null;
+    const evaluation = await evaluateExam(paper, req.body.answers, rubric);
 
     exam.answers = evaluation.answers;
     exam.score = evaluation.score;
