@@ -80,6 +80,7 @@ export default function StudentReports() {
     <Layout title="Feedback Reports">
       <div className="space-y-4">
         {reports.map((r) => (
+          <Card key={r._id}>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
                 <div className="flex justify-between">
