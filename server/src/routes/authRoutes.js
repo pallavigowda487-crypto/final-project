@@ -7,8 +7,8 @@ import { logAudit } from '../utils/auditLogger.js';
 
 const router = express.Router();
 
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (id, role) =>
+  jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 
@@ -51,7 +51,7 @@ router.post(
 
       const allowedRole = role === 'admin' ? 'student' : role || 'student';
       const user = await User.create({ name, email, password, role: allowedRole });
-      const token = signToken(user._id);
+      const token = signToken(user._id, user.role);
 
       await logAudit({
         userId: user._id,
@@ -102,7 +102,7 @@ router.post(
     if (!user.isActive) {
       return res.status(401).json({ success: false, message: 'Account deactivated' });
     }
-    const token = signToken(user._id);
+    const token = signToken(user._id, user.role);
     await logAudit({
       userId: user._id,
       userEmail: user.email,
