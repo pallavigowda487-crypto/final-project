@@ -28,20 +28,31 @@ export default function StudentReports() {
     const criteriaCounts = {};
 
     report.scoreBreakdown.forEach((q) => {
-      if (q.criteria) {
+      if (q.criteria && typeof q.criteria === 'object') {
         Object.entries(q.criteria).forEach(([key, value]) => {
-          if (typeof value === 'number') {
-            criteriaTotals[key] = (criteriaTotals[key] || 0) + value;
-            criteriaCounts[key] = (criteriaCounts[key] || 0) + 1;
+          // Parse number robustly (handles '80', '80%', '80/100', or 80)
+          let num = null;
+          if (typeof value === 'number') num = value;
+          else if (typeof value === 'string') {
+            const match = value.match(/(\d+(\.\d+)?)/);
+            if (match) num = parseFloat(match[1]);
+          }
+
+          if (num !== null && !isNaN(num)) {
+            // Standardize key name formatting
+            let cleanKey = key.replace(/([A-Z])/g, ' $1').trim();
+            cleanKey = cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1);
+            
+            criteriaTotals[cleanKey] = (criteriaTotals[cleanKey] || 0) + num;
+            criteriaCounts[cleanKey] = (criteriaCounts[cleanKey] || 0) + 1;
           }
         });
       }
     });
 
     const results = Object.keys(criteriaTotals).map((key) => {
-      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
       const score = Math.round(criteriaTotals[key] / criteriaCounts[key]);
-      return { label, score };
+      return { label: key, score };
     });
 
     return results.length > 0 ? results : null;
@@ -74,7 +85,7 @@ export default function StudentReports() {
               </div>
 
               {/* Simple Visual Progress Bars */}
-              {getCriteriaScores(r) && (
+              {getCriteriaScores(r) ? (
                 <div className="w-full md:w-1/3 bg-slate-50 rounded-lg p-5">
                   <h4 className="font-medium text-sm text-gray-800 mb-4 border-b border-gray-200 pb-2">Rubric Performance</h4>
                   <div className="space-y-4">
@@ -93,6 +104,12 @@ export default function StudentReports() {
                       </div>
                     ))}
                   </div>
+                </div>
+              ) : (
+                <div className="w-full md:w-1/3 bg-slate-50 rounded-lg p-5 flex flex-col items-center justify-center text-center border-dashed border-2 border-gray-200">
+                  <span className="text-2xl mb-2">📊</span>
+                  <p className="text-sm text-gray-500 font-medium">Visual report not available</p>
+                  <p className="text-xs text-gray-400 mt-1">Detailed rubric analytics are only recorded for new exams.</p>
                 </div>
               )}
             </div>
