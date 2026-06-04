@@ -70,10 +70,52 @@ export const generateFeedbackReportPDF = async (report, exam, outputPath) => {
       doc.text('Weak Topics:');
       report.weakTopics.forEach((t) => doc.text(`  - ${t}`));
     }
-    doc.moveDown();
     if (report.improvementAreas?.length) {
       doc.text('Improvement Suggestions:');
       report.improvementAreas.forEach((s) => doc.text(`  - ${s}`));
+    }
+    
+    doc.moveDown();
+
+    // Add Rubric Performance Section if scoreBreakdown exists
+    if (report.scoreBreakdown && report.scoreBreakdown.length > 0) {
+      const criteriaTotals = {};
+      const criteriaCounts = {};
+
+      report.scoreBreakdown.forEach((q) => {
+        if (q.criteria && typeof q.criteria === 'object') {
+          Object.entries(q.criteria).forEach(([key, value]) => {
+            let num = null;
+            if (typeof value === 'number') num = value;
+            else if (typeof value === 'string') {
+              const match = value.match(/(\d+(\.\d+)?)/);
+              if (match) num = parseFloat(match[1]);
+            }
+
+            if (num !== null && !isNaN(num)) {
+              let cleanKey = key.replace(/([A-Z])/g, ' $1').trim();
+              cleanKey = cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1);
+              criteriaTotals[cleanKey] = (criteriaTotals[cleanKey] || 0) + num;
+              criteriaCounts[cleanKey] = (criteriaCounts[cleanKey] || 0) + 1;
+            }
+          });
+        }
+      });
+
+      const criteriaKeys = Object.keys(criteriaTotals);
+      if (criteriaKeys.length > 0) {
+        doc.fontSize(14).text('Rubric Performance Breakdown', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(10);
+        
+        criteriaKeys.forEach((key) => {
+          const score = Math.round(criteriaTotals[key] / criteriaCounts[key]);
+          // Create an ASCII progress bar (20 blocks total)
+          const filledBlocks = Math.round((score / 100) * 20);
+          const bar = '█'.repeat(filledBlocks) + '░'.repeat(20 - filledBlocks);
+          doc.text(`${key}: ${bar} ${score}%`);
+        });
+      }
     }
 
     doc.end();
