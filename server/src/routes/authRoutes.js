@@ -49,7 +49,7 @@ router.post(
         });
       }
 
-      const allowedRole = role === 'admin' ? 'student' : role || 'student';
+      const allowedRole = role || 'student';
       const user = await User.create({ name, email, password, role: allowedRole });
       const token = signToken(user._id, user.role);
 
